@@ -1,258 +1,248 @@
-# DossierIQ
+# DossierIQ — Document Intelligence & Knowledge Graph Investigation
 
-**DossierIQ** is an evidence-oriented document investigation application
-that extracts entities from documents, identifies supported
-relationships between them, and presents the results through an
-interactive knowledge graph.
+**DossierIQ** is a Python-based document intelligence system that extracts named entities, identifies configured relationships, and builds an interactive knowledge graph to support evidence-based investigations across documents.
 
-The project is designed to help users inspect *who or what appears in a
-document, which supported relationships were detected, and what source
-evidence supports each relationship*.
+It transforms unstructured text into structured entity and relationship records, helping users explore connections and trace each detected relationship back to its source document and supporting evidence.
 
-## Current Features
+## Overview
 
--   **PDF and TXT ingestion** --- extracts text from supported PDF and
-    plain-text files.
--   **Named-entity extraction** --- uses spaCy (`en_core_web_sm`) to
-    identify entities such as organizations, people, dates, and
-    locations.
--   **Entity resolution** --- normalizes entity names and resolves
-    matching mentions to canonical entities.
--   **Rule-based relationship extraction** --- identifies relationships
-    using explicitly configured text patterns and entity-type
-    constraints.
--   **Evidence-backed relationships** --- records the supporting text
-    and source-document information for detected relationships.
--   **Knowledge graph construction** --- represents entities and
-    directed relationships with NetworkX.
--   **Interactive graph visualization** --- uses PyVis to show entity
-    types with distinct colors, directional edges, filters, and hover
-    details.
--   **Graph Console** --- lets users select an entity and inspect its
-    incoming and outgoing relationships, source documents, and evidence.
--   **Investigation Explorer** --- supports inspection of an entity's
-    direct connections and the evidence associated with those
-    relationships.
--   **Persistence and retrieval** --- stores investigations in SQLite
-    and allows saved investigations to be reopened, with their graph
-    reconstructed from stored data.
--   **Streamlit dashboard** --- provides the application interface for
-    running and reviewing investigations.
+Investigating documents manually can make it difficult to identify relevant entities, discover relationships, and keep track of supporting evidence.
 
-## Current Scope
+DossierIQ streamlines this process through a modular NLP pipeline, a directed knowledge graph, and a Streamlit dashboard. Users can upload documents, inspect extracted information, visualize relationships, and save investigations for later review.
 
-DossierIQ currently uses a conservative, rule-based approach to
-relationship extraction. It detects only relationship patterns that have
-been explicitly implemented. It does **not** guarantee detection of
-every relationship in a document, and the absence of a displayed
-relationship should not be interpreted as proof that no real-world
-relationship exists.
+## Key Features
 
-**Multi-document processing is planned as a future add-on and is not
-presented here as a completed feature.** The current project should be
-evaluated against the functionality that has been implemented and
-tested.
+- **Document ingestion:** Load TXT and text-based PDF documents.
+- **Named Entity Recognition:** Extract entities using spaCy's NLP pipeline.
+- **Entity resolution:** Normalize entity names and resolve mentions using entity-name and entity-type matching.
+- **Rule-based relationship extraction:** Detect supported relationships using configured textual patterns.
+- **Knowledge graph construction:** Represent entities as nodes and detected relationships as directed edges using NetworkX.
+- **Evidence-backed relationships:** Retain supporting text and source-document information for detected relationships.
+- **Interactive visualization:** Explore the knowledge graph through a PyVis-based visualization.
+- **Investigation Explorer:** Inspect an entity's direct relationships and the evidence associated with them.
+- **Investigation persistence:** Store and reopen saved investigations using SQLite.
+- **Automated tests:** Validate core processing, graph construction, database operations, and investigation retrieval.
 
 ## Technology Stack
 
-  Component                       Technology
-  ------------------------------- -------------------------
-  Language                        Python
-  Dashboard                       Streamlit
-  PDF text extraction             pypdf
-  Named-entity recognition        spaCy, `en_core_web_sm`
-  Entity and relationship graph   NetworkX
-  Interactive graph display       PyVis
-  Persistence                     SQLite
-  Testing                         Python `unittest`
+| Component | Technology |
+|---|---|
+| Language | Python |
+| User interface | Streamlit |
+| Natural Language Processing | spaCy |
+| Entity extraction model | `en_core_web_sm` |
+| Knowledge graph | NetworkX |
+| Interactive graph visualization | PyVis |
+| Database | SQLite |
+| PDF processing | pypdf |
+| Testing | Python `unittest` |
+
+## System Architecture
+
+DossierIQ follows a modular processing architecture.
+
+1. **Document loading:** Read supported files and extract their text and metadata.
+2. **Entity extraction:** Identify named entities and retain their contextual information.
+3. **Entity resolution:** Normalize entity names and group matching mentions by name and entity type.
+4. **Relationship extraction:** Apply configured patterns to identify supported relationships between entities.
+5. **Knowledge graph construction:** Build a directed multigraph containing entity nodes and relationship edges.
+6. **Result presentation:** Display document information, extracted entities, relationships, evidence, and graph visualizations.
+7. **Persistence:** Save investigation records in SQLite so they can be reopened later.
+
+### Processing Workflow
+
+```text
+TXT / Text-Based PDF
+         |
+         v
+   Document Loader
+         |
+         v
+ Named Entity Recognition
+         |
+         v
+   Entity Resolution
+         |
+         v
+Rule-Based Relationship Extraction
+         |
+         v
+  Knowledge Graph
+         |
+         v
+   Streamlit Dashboard
+      /          \
+     v            v
+Interactive     Evidence &
+Graph Explorer  Relationship Tables
+         |
+         v
+ SQLite Persistence
+ (Save / Retrieve)
+```
+
+The workflow illustrates the logical processing stages. SQLite persistence is used when an investigation is saved; it is not a mandatory step for every displayed result.
 
 ## Project Structure
 
-The main project modules are organized as follows:
-
-``` text
+```text
 DossierIQ/
 ├── app/
-│   ├── streamlit_app.py       # Streamlit application
-│   └── graph_visualizer.py    # Interactive knowledge graph
+│   ├── streamlit_app.py
+│   └── graph_visualizer.py
 ├── core/
-│   ├── document_loader.py     # PDF/TXT text extraction
-│   ├── entity_extractor.py    # Named-entity extraction
-│   ├── entity_resolver.py     # Entity normalization/resolution
-│   ├── relationship_extractor.py
-│   ├── knowledge_graph.py     # Graph construction
-│   ├── investigation.py       # Investigation workflow
-│   └── investigation_graph.py # Reconstruct saved graph
+│   ├── document_loader.py
+│   ├── entity_extractor.py
+│   ├── entity_resolver.py
+│   ├── pipeline.py
+│   ├── knowledge_graph.py
+│   ├── investigation.py
+│   ├── investigation_graph.py
+│   └── relationship_extractor.py
 ├── storage/
-│   ├── database.py            # SQLite setup/schema
-│   ├── investigation_store.py # Persist investigation results
+│   ├── database.py
+│   ├── investigation_store.py
 │   └── investigation_retrieval.py
 ├── data/
-│   ├── documents/             # Sample/input documents
-│   └── processed/             # Processing artifacts, if used
-├── tests/                     # Automated tests
+│   └── documents/
+│       ├── sample.txt
+│       └── sample.pdf
+├── tests/
+├── requirements.txt
 ├── .gitignore
 └── README.md
 ```
 
-Some local development files or additional modules may exist in a
-working checkout and are not listed above.
+The structure above highlights the principal modules. Additional initialization files and test modules are present in the repository.
 
-## Requirements
+## Getting Started
 
--   Python 3.12 (the project has been developed and tested in a Python
-    3.12 environment)
--   pip
--   The spaCy English small model, `en_core_web_sm`
+### Prerequisites
 
-## Setup
+- Python 3.12 recommended
+- Git
+- pip
 
-Run these commands from the project root.
+### 1. Clone the repository
 
-### 1. Create and activate a virtual environment
+```bash
+git clone https://github.com/vansh-13042005/DossierIQ.git
+cd DossierIQ
+```
+
+### 2. Create a virtual environment
 
 **Windows PowerShell:**
 
-``` powershell
+```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
 
-If PowerShell blocks script activation, use Command Prompt instead:
+If PowerShell prevents activation, use the Python executable inside `.venv` directly or follow your local Python environment policy.
 
-``` bat
-.venv\Scripts\activate.bat
+### 3. Install dependencies
+
+```bash
+python -m pip install --upgrade pip
+pip install -r requirements.txt
 ```
 
-### 2. Install dependencies
+Ensure that the spaCy English model is available:
 
-If the repository contains a maintained `requirements.txt`, install from
-it:
-
-``` powershell
-python -m pip install -r requirements.txt
-```
-
-Otherwise, install the currently used runtime packages:
-
-``` powershell
-python -m pip install streamlit spacy pypdf networkx pyvis
+```bash
 python -m spacy download en_core_web_sm
 ```
 
-If spaCy reports that `en_core_web_sm` is missing, run the
-model-download command above in the same virtual environment used to
-launch the application.
+### 4. Launch the application
 
-## Run the Application
+From the repository root, run:
 
-From the project root:
-
-``` powershell
+```bash
 python -m streamlit run app/streamlit_app.py
 ```
 
-Streamlit will print a local URL in the terminal. Open that URL in your
-browser.
+Streamlit will provide a local URL in the terminal. Open that URL in your browser.
 
-## Typical Workflow
+### 5. Run an investigation
 
-1.  Launch the Streamlit application.
-2.  Upload supported PDF or TXT input documents using the interface.
-3.  Start an investigation.
-4.  Review the investigation overview and extracted entities.
-5.  Inspect detected relationships and their supporting evidence.
-6.  Explore the interactive knowledge graph. Use the entity-type and
-    relationship-type filters to focus the view; isolated entities can
-    also be shown or hidden.
-7.  Use the Graph Console and Investigation Explorer to inspect an
-    entity's connections and source evidence.
-8.  Reopen a saved investigation from the dashboard when needed.
+1. Upload one or more supported TXT or text-based PDF files.
+2. Start a new investigation.
+3. Review the document summary and extracted entities.
+4. Inspect detected relationships and their supporting evidence.
+5. Explore the interactive knowledge graph.
+6. Save the investigation if you want to reopen it later.
 
-The exact controls and available inputs depend on the current version of
-the application.
-
-## Relationship Extraction
-
-Relationship extraction is pattern-based. Each supported pattern
-specifies a relationship type, direction, and allowed entity types. For
-example, implemented patterns include agreement-related relationships
-and acquisition relationships.
-
-Because this approach relies on explicit patterns, different wording,
-sentence structures, missing entity mentions, or unsupported
-relationship types may cause a relationship not to be detected. Add new
-patterns only with tests that verify both the relationship and its
-direction.
-
-## Data Storage
-
-Investigation results are stored in a local SQLite database, currently
-configured by the application under:
-
-``` text
-data/dossieriq.db
-```
-
-Keep the database file if you want to retain local saved investigations.
-Do not commit private or sensitive investigation documents, extracted
-content, or database records to a public repository.
+The repository includes sample documents under `data/documents/` for initial exploration.
 
 ## Testing
 
-The project uses Python's `unittest` framework. Run the
-relationship-extractor tests with:
+DossierIQ includes automated tests for its core modules.
 
-``` powershell
-python -m unittest tests.test_relationship_extractor -v
-```
+Run the test suite from the project root:
 
-Run the full test suite from the project root with:
-
-``` powershell
+```bash
 python -m unittest discover -s tests -v
 ```
 
-The relationship-extractor suite was reported to pass all 38 tests
-during development. Test results can change as the code evolves; run the
-suite against your current checkout before presenting or submitting the
-project.
+Use the output from your current environment as the authoritative test result. The number of passing tests may change as the project evolves.
 
-## Current Limitations
+## Important Design Decisions
 
--   Relationship extraction covers only explicitly configured patterns.
--   Some entities may remain isolated because no supported relationship
-    was detected for them.
--   Entity recognition and canonicalization can be imperfect,
-    particularly for unusual names or ambiguous mentions.
--   Evidence context and source attribution should be checked against
-    the original document before relying on a result.
--   Multi-document processing is reserved for future development and
-    should not be treated as a completed capability.
+### Rule-Based Relationship Extraction
+
+DossierIQ uses configured relationship patterns rather than unrestricted semantic inference. A relationship is detected only when the text matches a supported pattern and the relevant entity constraints are satisfied.
+
+This approach makes the extraction logic explicit and testable, but its coverage depends on the patterns implemented.
+
+### Entity Resolution
+
+Entity mentions are normalized and compared using their names and entity types. This helps consolidate matching mentions, but it does not guarantee that every spelling variation, alias, or ambiguous name will be resolved correctly.
+
+### Evidence and Traceability
+
+Detected relationships retain supporting text and source-document information. This allows users to inspect why a relationship appears in the graph rather than relying solely on a visual connection.
+
+## Limitations
+
+- **Input formats:** The current loader supports TXT and text-based PDFs; scanned, image-only PDFs are not automatically OCR-processed.
+- **Entity extraction:** spaCy may miss entities, classify them incorrectly, or identify irrelevant mentions.
+- **Relationship coverage:** Only configured relationship patterns are detected.
+- **Entity resolution:** Name normalization and entity-type matching cannot reliably resolve every alias or ambiguous identity.
+- **Graph completeness:** The graph contains only the entities and relationships extracted by the implemented pipeline.
+- **Evidence interpretation:** Supporting text is presented for inspection; its presence does not guarantee that the extracted relationship is factually correct.
 
 ## Future Work
 
-Potential future improvements include:
+Potential enhancements include:
 
--   Multi-document processing and cross-document entity linking.
--   Broader relationship patterns and stronger relationship validation.
--   Better entity disambiguation and canonicalization.
--   Improved evidence sentence selection and source traceability.
--   Additional graph exploration and filtering features.
--   More representative sample documents and end-to-end regression
-    tests.
+- More robust cross-document entity resolution and alias handling.
+- Expanded relationship patterns and extraction coverage.
+- Confidence scoring and stronger evidence validation.
+- OCR support for scanned documents.
+- Graph filtering and improved exploration for larger investigations.
+- Investigation export and richer reporting.
+- Additional evaluation using manually annotated documents and relationship-level metrics.
 
-## Academic Use and Disclaimer
+These are potential extensions, not claims about currently implemented functionality.
 
-DossierIQ is a student project intended for document-analysis and
-investigation-workflow experimentation. Its extracted entities and
-relationships are machine-generated and may be incomplete or incorrect.
-Verify findings against the original source documents before drawing
-conclusions. The application should not be treated as an autonomous
-source of factual or legal determinations.
+## Intended Use
 
-## License
+DossierIQ is an academic mini-project demonstrating document processing, NLP, entity resolution, rule-based information extraction, graph representation, evidence traceability, and persistence.
 
-No license has been specified yet. Add a license file before
-distributing or accepting external contributions under explicit reuse
-terms.
+It is intended as an investigative aid for exploring extracted information. Its outputs should be reviewed against the original documents before being used to make consequential decisions.
+
+## Author
+
+**Vansh Tomar**
+
+B.Tech — Computer Science and Engineering (Artificial Intelligence and Machine Learning)
+
+Meerut Institute of Engineering and Technology (MIET), Meerut
+
+- GitHub: [@vansh-13042005](https://github.com/vansh-13042005)
+- Project Repository: [DossierIQ](https://github.com/vansh-13042005/DossierIQ)
+
+---
+
+*DossierIQ — From unstructured documents to traceable entity relationships.*

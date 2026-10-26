@@ -23,6 +23,23 @@ DossierIQ streamlines this process through a modular NLP pipeline, a directed kn
 - **Investigation persistence:** Store and reopen saved investigations using SQLite.
 - **Automated tests:** Validate core processing, graph construction, database operations, and investigation retrieval.
 
+## 📸 Application Screenshots
+
+### Investigation Overview
+View the investigation summary, processed documents, extracted entities, and discovered relationships.
+
+![DossierIQ Investigation Overview](images/investigation-overview.png)
+
+### Interactive Knowledge Graph
+Explore entities and their evidence-backed relationships through an interactive graph.
+
+![DossierIQ Knowledge Graph](images/knowledge-graph.png)
+
+### Extracted Entities and Relationships
+Inspect extracted entities, relationship types, source documents, and supporting evidence.
+
+![DossierIQ Extracted Entities and Relationships](images/extracted-entities.png)
+
 ## Technology Stack
 
 | Component | Technology |
@@ -236,12 +253,6 @@ It is intended as an investigative aid for exploring extracted information. Its 
 
 **Vansh Tomar**
 
-B.Tech — Computer Science and Engineering (Artificial Intelligence and Machine Learning)
-
-Meerut Institute of Engineering and Technology (MIET), Meerut
-
-- GitHub: [@vansh-13042005](https://github.com/vansh-13042005)
-- Project Repository: [DossierIQ](https://github.com/vansh-13042005/DossierIQ)
 
 ---
 
